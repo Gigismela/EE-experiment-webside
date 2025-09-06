@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EE — Experiment Demo Store (2 min)</title>
+  <style>
+    :root{--accent:#2563eb;--muted:#6b7280;--bg:#f7f8fb}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; margin:0;background:var(--bg);color:#111}
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;background:white;box-shadow:0 1px 6px rgba(2,6,23,0.06)}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#eef2ff,#dbeafe);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)}
+    .demo-badge{background:#ffedd5;color:#9a3412;padding:6px 8px;border-radius:8px;font-weight:700;font-size:12px}
+    .top-right{display:flex;gap:12px;align-items:center}
+    .timer{font-weight:700;color:#111}
+    .btn{background:white;border:1px solid #e6e6e9;padding:8px 10px;border-radius:8px;cursor:pointer}
+    .btn.primary{background:var(--accent);color:white;border:none}
+    main{padding:18px 22px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+    .product{background:white;border-radius:12px;padding:12px;box-shadow:0 1px 6px rgba(2,6,23,0.04);display:flex;flex-direction:column;gap:10px}
+    .img{height:140px;border-radius:8px;background:linear-gradient(135deg,#f3f4f6,#e6eefc);display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:700}
+    .row{display:flex;justify-content:space-between;align-items:center}
+    .muted{color:var(--muted);font-size:13px}
+
+    /* cart modal */
+    .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:60}
+    .modal{width:420px;background:white;border-radius:12px;padding:16px;box-shadow:0 10px 30px rgba(2,6,23,0.2)}
+    .cart-list{max-height:260px;overflow:auto;margin-top:8px}
+    .cart-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f1f2}
+
+    /* checkout form */
+    .form-row{display:flex;gap:8px}
+    .field{flex:1;display:flex;flex-direction:column;gap:6px}
+    input,select,textarea{padding:8px;border-radius:8px;border:1px solid #e6e6e9}
+
+    /* expired overlay */
+    .expired{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:80;color:white}
+    .expired .card{background:transparent;color:white;text-align:center}
+
+    footer{padding:18px 22px;text-align:center;color:var(--muted);font-size:13px}
+
+    @media (max-width:520px){.modal{width:92vw}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">EE</div>
+      <div>
+        <div style="font-weight:800">EE — Experiment Store</div>
+        <div class="muted">Realistic demo — no payments</div>
+      </div>
+    </div>
+    <div class="top-right">
+      <div class="demo-badge">DEMO</div>
+      <div class="timer" id="timer">02:00</div>
+      <button id="cartBtn" class="btn">Cart (0)</button>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2 style="margin-top:0">Products</h2>
+      <div class="grid" id="products"></div>
+    </section>
+  </main>
+
+  <!-- Cart Modal -->
+  <div id="cartOverlay" class="overlay">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0">Your Cart</h3>
+        <button id="closeCart" class="btn">Close</button>
+      </div>
+      <div class="cart-list" id="cartList"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+        <div style="font-weight:700">Total: <span id="cartTotal">$0.00</span></div>
+        <div>
+          <button id="checkoutOpen" class="btn primary">Checkout (Demo)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div id="checkoutOverlay" class="overlay">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0">Checkout (Demo)</h3>
+        <button id="closeCheckout" class="btn">Close</button>
+      </div>
+
+      <form id="checkoutForm" style="margin-top:10px">
+        <div style="display:flex;gap:10px">
+          <div style="flex:1" class="field">
+            <label>Name</label>
+            <input id="c_name" required />
+          </div>
+          <div style="flex:1" class="field">
+            <label>Email</label>
+            <input id="c_email" type="email" required />
+          </div>
+        </div>
+
+        <div style="margin-top:8px" class="field">
+          <label>Shipping address</label>
+          <input id="c_address" placeholder="Street, house no." required />
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="c_city" class="field" placeholder="City" required />
+          <input id="c_postal" class="field" placeholder="Postal code" required />
+        </div>
+
+        <hr style="margin:12px 0" />
+        <div style="color:var(--muted);font-size:13px;margin-bottom:8px">Payment (DEMO) — <strong>do not</strong> enter real card details. This demo never charges cards.</div>
+        <div style="display:flex;gap:8px">
+          <input placeholder="Card number" disabled />
+          <input placeholder="MM/YY" disabled />
+          <input placeholder="CVV" disabled />
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+          <div class="muted">Total: <strong id="checkoutTotal">$0.00</strong></div>
+          <button type="submit" class="btn primary">Place demo order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Expired Overlay -->
+  <div id="expiredOverlay" class="expired">
+    <div class="card">
+      <h2 style="margin:0 0 8px 0">Session expired</h2>
+      <div style="max-width:540px">This demo session has ended after 2 minutes. Refresh the page to start a new demo. (Note: demo is client-only; refreshing may start a new session.)</div>
+    </div>
+  </div>
+
+  <div id="confirmationOverlay" class="overlay" style="display:none">
+    <div class="modal">
+      <h3>Order confirmed (Demo)</h3>
+      <div id="orderSummary"></div>
+      <div style="margin-top:12px;display:flex;justify-content:flex-end">
+        <button id="closeConfirmation" class="btn primary">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Demo site for experimentation. No real payments.
+  </footer>
+
+<script>
+(function(){
+  // ====== CONFIG ======
+  const SESSION_MS = 2 * 60 * 1000; // 2 minutes
+  const START_KEY = 'demoStart_EE---experiment-webside'; // unique key for this demo
+
+  // ====== PRODUCTS ======
+  const PRODUCTS = [
+    { id:'p1', title:'Blue Hoodie', price:49.99, desc:'Cozy cotton hoodie.' },
+    { id:'p2', title:'Classic Sneakers', price:79.99, desc:'Comfort & style in one.' },
+    { id:'p3', title:'Urban Backpack', price:39.99, desc:'Carry your world.' },
+    { id:'p4', title:'Wireless Headphones', price:99.99, desc:'Noise-cancelling demo.' },
+    { id:'p5', title:'Sunglasses', price:19.99, desc:'UV protection.' },
+    { id:'p6', title:'Stainless Bottle', price:14.99, desc:'Keep drinks cold.' }
+  ];
+
+  // ====== ELEMENTS ======
+  const productsEl = document.getElementById('products');
+  const cartBtn = document.getElementById('cartBtn');
+  const cartOverlay = document.getElementById('cartOverlay');
+  const closeCart = document.getElementById('closeCart');
+  const cartList = document.getElementById('cartList');
+  const cartTotalEl = document.getElementById('cartTotal');
+  const checkoutOpen = document.getElementById('checkoutOpen');
+
+  const checkoutOverlay = document.getElementById('checkoutOverlay');
+  const closeCheckout = document.getElementById('closeCheckout');
+  const checkoutForm = document.getElementById('checkoutForm');
+  const checkoutTotal = document.getElementById('checkoutTotal');
+
+  const timerEl = document.getElementById('timer');
+  const expiredOverlay = document.getElementById('expiredOverlay');
+
+  const confirmationOverlay = document.getElementById('confirmationOverlay');
+  const orderSummary = document.getElementById('orderSummary');
+  const closeConfirmation = document.getElementById('closeConfirmation');
+
+  // ====== STATE ======
+  let cart = JSON.parse(localStorage.getItem('demoCart') || '[]');
+  let isExpired = false;
+
+  // ====== RENDER PRODUCTS ======
+  function renderProducts(){
+    productsEl.innerHTML = PRODUCTS.map(p => `
+      <div class="product" data-id="${p.id}">
+        <div class="img">${p.title.split(' ')[0]}</div>
+        <div style="flex:1">
+          <div style="font-weight:800">${escapeHtml(p.title)}</div>
+          <div class="muted" style="font-size:13px">${escapeHtml(p.desc)}</div>
+        </div>
+        <div class="row">
+          <div style="font-weight:700">$${p.price.toFixed(2)}</div>
+          <div>
+            <button class="btn addBtn" data-id="${p.id}">Add</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    // attach handlers
+    document.querySelectorAll('.addBtn').forEach(btn => {
+      btn.addEventListener('click', ()=>{
+        const id = btn.dataset.id;
+        addToCart(id);
+      });
+    });
+  }
+
+  function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  // ====== CART LOGIC ======
+  function addToCart(id){ if(isExpired) return alert('Session expired');
+    const p = PRODUCTS.find(x=>x.id===id); if(!p) return;
+    const existing = cart.find(i=>i.id===id);
+    if(existing) existing.qty += 1; else cart.push({id:p.id,title:p.title,price:p.price,qty:1});
+    saveCart(); updateCartUI();
+  }
+
+  function saveCart(){ localStorage.setItem('demoCart', JSON.stringify(cart)); }
+
+  function updateCartUI(){
+    cartBtn.textContent = `Cart (${cart.reduce((s,i)=>s+i.qty,0)})`;
+  }
+
+  function openCart(){ renderCartList(); cartOverlay.style.display='flex'; }
+  function closeCartFn(){ cartOverlay.style.display='none'; }
+
+  function renderCartList(){
+    if(cart.length===0){ cartList.innerHTML = '<div class="muted">Your cart is empty.</div>'; cartTotalEl.textContent='$0.00'; checkoutOpen.disabled=true; return; }
+    checkoutOpen.disabled=false;
+    cartList.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div style="flex:1">
+          <div style="font-weight:700">${escapeHtml(item.title)}</div>
+          <div class="muted">Qty: <strong>${item.qty}</strong></div>
+        </div>
+        <div style="text-align:right">
+          <div>$${(item.price*item.qty).toFixed(2)}</div>
+          <div style="margin-top:6px">
+            <button class="btn small" data-act="dec" data-id="${item.id}">-</button>
+            <button class="btn small" data-act="inc" data-id="${item.id}">+</button>
+            <button class="btn" data-act="rem" data-id="${item.id}">Remove</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    cartList.querySelectorAll('button').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const id = b.dataset.id; const act = b.dataset.act;
+        const idx = cart.findIndex(x=>x.id===id);
+        if(idx===-1) return;
+        if(act==='dec'){ cart[idx].qty = Math.max(1, cart[idx].qty-1); }
+        if(act==='inc'){ cart[idx].qty += 1; }
+        if(act==='rem'){ cart.splice(idx,1); }
+        saveCart(); renderCartList(); updateCartUI();
+      });
+    });
+
+    const total = cart.reduce((s,i)=>s + i.price*i.qty,0);
+    cartTotalEl.textContent = '$' + total.toFixed(2);
+  }
+
+  // ====== CHECKOUT ======
+  function openCheckout(){ if(isExpired) return alert('Session expired');
+    if(cart.length===0) return alert('Cart is empty');
+    checkoutOverlay.style.display='flex';
+    checkoutTotal.textContent = '$' + cart.reduce((s,i)=>s+i.price*i.qty,0).toFixed(2);
+  }
+  function closeCheckoutFn(){ checkoutOverlay.style.display='none'; }
+
+  checkoutForm.addEventListener('submit', function(e){ e.preventDefault();
+    if(isExpired) return alert('Session expired');
+    // simple validation
+    const name = document.getElementById('c_name').value.trim();
+    const email = document.getElementById('c_email').value.trim();
+    const address = document.getElementById('c_address').value.trim();
+    if(!name||!email||!address) return alert('Please fill name, email and address (demo).');
+
+    // simulate processing
+    const order = {
+      id: 'DEMO-' + Math.random().toString(36).slice(2,10).toUpperCase(),
+      name, email, address,
+      items: cart.slice(),
+      total: cart.reduce((s,i)=>s+i.price*i.qty,0).toFixed(2),
+      time: new Date().toISOString()
+    };
+
+    // show confirmation
+    orderSummary.innerHTML = `<div><strong>Order ID:</strong> ${order.id}</div>
+      <div style="margin-top:8px"><strong>Items:</strong><ul>` + order.items.map(it=>`<li>${escapeHtml(it.title)} × ${it.qty} — $${(it.price*it.qty).toFixed(2)}</li>`).join('') + `</ul></div>
+      <div style="margin-top:8px"><strong>Total (demo):</strong> $${order.total}</div>
+    `;
+
+    // clear cart but keep session
+    cart = []; saveCart(); updateCartUI();
+    checkoutOverlay.style.display='none';
+    confirmationOverlay.style.display='flex';
+  });
+
+  closeConfirmation.addEventListener('click', ()=>{ confirmationOverlay.style.display='none'; });
+
+  // ====== TIMER & SESSION ======
+  function ensureStart(){
+    let start = localStorage.getItem(START_KEY);
+    if(!start){ start = Date.now(); localStorage.setItem(START_KEY, String(start)); }
+    return Number(start);
+  }
+
+  let startTs = ensureStart();
+
+  function updateTimer(){
+    const elapsed = Date.now() - startTs;
+    const remaining = Math.max(0, SESSION_MS - elapsed);
+    const mm = String(Math.floor(remaining/60000)).padStart(2,'0');
+    const ss = String(Math.floor((remaining%60000)/1000)).padStart(2,'0');
+    timerEl.textContent = `${mm}:${ss}`;
+    if(remaining <= 0 && !isExpired) expireSession();
+  }
+
+  function expireSession(){
+    isExpired = true;
+    expiredOverlay.style.display = 'flex';
+    // disable interactive elements
+    document.querySelectorAll('button').forEach(b=>b.disabled=true);
+    document.querySelectorAll('input,textarea,select').forEach(i=>i.disabled=true);
+  }
+
+  // helper for manual reset (developer only) — hold Shift and click timer to reset demo
+  timerEl.addEventListener('click', (e)=>{
+    if(e.shiftKey){ localStorage.removeItem(START_KEY); startTs = ensureStart(); isExpired=false; document.querySelectorAll('button,input').forEach(el=>el.disabled=false); expiredOverlay.style.display='none'; updateTimer(); alert('Demo timer reset (developer).'); }
+  });
+
+  // ====== UI EVENTS ======
+  cartBtn.addEventListener('click', openCart);
+  closeCart.addEventListener('click', closeCartFn);
+  checkoutOpen.addEventListener('click', ()=>{ openCheckout(); });
+  closeCheckout.addEventListener('click', closeCheckoutFn);
+
+  // init
+  renderProducts(); updateCartUI(); updateTimer();
+  setInterval(updateTimer, 250);
+
+})();
+</script>
+</body>
+</html>

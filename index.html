@@ -186,6 +186,8 @@
   // ====== STATE ======
   let cart = JSON.parse(localStorage.getItem('demoCart') || '[]');
   let isExpired = false;
+  let codeEntered = false;  // <-- new flag to track if the CODE button was successfully used
+
 
   // ====== PRODUCTS ======
   const PRODUCTS = [
@@ -312,14 +314,16 @@
 
   // ====== TIMER & SESSION ======
   let startTs = ensureStart();
-  function updateTimer(){
-    const elapsed = Date.now() - startTs;
-    const remaining = Math.max(0, SESSION_MS - elapsed);
-    const mm = String(Math.floor(remaining/60000)).padStart(2,'0');
-    const ss = String(Math.floor((remaining%60000)/1000)).padStart(2,'0');
-    timerEl.textContent = `${mm}:${ss}`;
-    if(remaining <= 0 && !isExpired) expireSession();
-  }
+ function updateTimer(){
+  const elapsed = Date.now() - startTs;
+  const remaining = Math.max(0, SESSION_MS - elapsed);
+  const mm = String(Math.floor(remaining/60000)).padStart(2,'0');
+  const ss = String(Math.floor((remaining%60000)/1000)).padStart(2,'0');
+  timerEl.textContent = `${mm}:${ss}`;
+
+  // Only expire session if not yet expired AND code has not been entered
+  if(remaining <= 0 && !isExpired && !codeEntered) expireSession();
+}
 
   function expireSession(){
     isExpired = true;
@@ -350,18 +354,26 @@
 
   // ====== CODE BUTTON ======
   codeBtn.addEventListener('click', ()=>{
-    const userCode = prompt("Enter code to continue:");
-    if(userCode==="12345"){
-      expiredOverlay.style.display='none';
-      codeBtn.style.display='none';
-      document.querySelectorAll('button,input,textarea,select').forEach(el=>el.disabled=false);
-      isExpired = false;
-      updateCartUI();
-      alert("Access granted! You can continue.");
-    } else {
-      alert("Incorrect code!");
-    }
-  });
+  const userCode = prompt("Enter code to continue:");
+  if(userCode==="12345"){
+    expiredOverlay.style.display='none';
+    codeBtn.style.display='none';
+
+    // Re-enable all buttons, inputs, textareas, selects
+    document.querySelectorAll('button,input,textarea,select').forEach(el=>el.disabled=false);
+
+    // Mark session as unlocked
+    isExpired = false;
+    codeEntered = true;  // <-- important, prevents overlay from appearing again
+
+    // Update cart UI
+    updateCartUI();
+
+    alert("Access granted! You can continue.");
+  } else {
+    alert("Incorrect code!");
+  }
+});
 
   // ====== INIT ======
   renderProducts();

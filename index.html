@@ -23,6 +23,11 @@
     .row{display:flex;justify-content:space-between;align-items:center}
     .muted{color:var(--muted);font-size:13px}
 
+    /* long description*/
+    .long-desc {font-size: 20px;color: #6b7280;margin: 8px 0 12px 0}
+
+
+    
     /* cart modal */
     .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:60}
     .modal{width:420px;background:white;border-radius:12px;padding:16px;box-shadow:0 10px 30px rgba(2,6,23,0.2)}
@@ -159,12 +164,12 @@
 
   // ====== PRODUCTS ======
   const PRODUCTS = [
-    { id:'p1', title:'Black Hoodie 1', price:49.99, desc:'BESTSELLER' },
-    { id:'p2', title:'Black Hoodie 2', price:49.99 },
-    { id:'p3', title:'Black Hoodie 3', price:49.99, desc:'avaiable now' },
-    { id:'p4', title:'Black Hoodie 4', price:49.99, desc:'in stock' },
-    { id:'p5', title:'Black Hoodie 5', price:49.99 },
-    { id:'p6', title:'Black Hoodie 6', price:44.99, desc:'LAST 2 LEFT' }
+    { id:'p1', title:'Black Hoodie 1', price:49.99, desc:'BESTSELLER', longDesc: 'DESCRIPTION' },
+    { id:'p2', title:'Black Hoodie 2', price:49.99, longDesc: 'DESCRIPTION' },
+    { id:'p3', title:'Black Hoodie 3', price:49.99, desc:'avaiable now', longDesc: 'DESCRIPTION' },
+    { id:'p4', title:'Black Hoodie 4', price:49.99, desc:'in stock', longDesc: 'DESCRIPTION' },
+    { id:'p5', title:'Black Hoodie 5', price:49.99, longDesc: 'DESCRIPTION' },
+    { id:'p6', title:'Black Hoodie 6', price:44.99, desc:'LAST 2 LEFT', longDesc: 'DESCRIPTION' }
   ];
 
   // ====== ELEMENTS ======
@@ -200,6 +205,7 @@
         <div style="flex:1">
           <div style="font-weight:800">${escapeHtml(p.title)}</div>
           <div class="muted" style="font-size:13px">${escapeHtml(p.desc)}</div>
+          <div class="long-desc">${escapeHtml(p.longDesc || '')}</div>
         </div>
         <div class="row">
           <div style="font-weight:700">$${p.price.toFixed(2)}</div>
@@ -209,7 +215,7 @@
         </div>
       </div>
     `).join('');
-
+    
     // attach handlers
     document.querySelectorAll('.addBtn').forEach(btn => {
       btn.addEventListener('click', ()=>{

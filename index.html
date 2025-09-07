@@ -47,17 +47,73 @@
     footer{padding:18px 22px;text-align:center;color:var(--muted);font-size:13px}
 
     @media (max-width:520px){.modal{width:92vw}}
+    
+    header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 22px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(2,6,23,0.1);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.banner-img {
+  width: 1200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.timer {
+  font-weight: 800;
+  font-size: 22px; /* larger timer */
+}
+
+.cart-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.cart-icon {
+  width: 42px;
+  height: 42px;
+}
+
+#cartCount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+}
+
   </style>
 </head>
 <body>
  <header>
   <div class="header-left">
-    <img src="banner.jpg" alt="Banner" class="banner-img">
+    <img src="Eternal.jpg" alt="Banner" class="eternal-img">
   </div>
   <div class="header-right">
     <div class="timer" id="timer">02:00</div>
     <button id="cartBtn" class="cart-btn">
-      <img src="cart.png" alt="Cart" class="cart-icon">
+      <img src="Untitled design-2.jpg" alt="Cart" class="cart-icon">
       <span id="cartCount">(0)</span>
     </button>
   </div>

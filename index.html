@@ -50,20 +50,18 @@
   </style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <div class="logo">EE</div>
-      <div>
-        <div style="font-weight:800">EE — Experiment Store</div>
-        <div class="muted">Realistic demo — no payments</div>
-      </div>
-    </div>
-    <div class="top-right">
-      <div class="demo-badge">DEMO</div>
-      <div class="timer" id="timer">02:00</div>
-      <button id="cartBtn" class="btn">Cart (0)</button>
-    </div>
-  </header>
+ <header>
+  <div class="header-left">
+    <img src="banner.jpg" alt="Banner" class="banner-img">
+  </div>
+  <div class="header-right">
+    <div class="timer" id="timer">02:00</div>
+    <button id="cartBtn" class="cart-btn">
+      <img src="cart.png" alt="Cart" class="cart-icon">
+      <span id="cartCount">(0)</span>
+    </button>
+  </div>
+</header>
 
   <main>
     <section>
@@ -255,7 +253,10 @@
   }
 
   // ====== CART ======
-  function updateCartUI(){ cartBtn.textContent = `Cart (${cart.reduce((s,i)=>s+i.qty,0)})`; }
+  function updateCartUI() {
+  document.getElementById('cartCount').textContent = `(${cart.reduce((s,i)=>s+i.qty,0)})`;
+}
+
   function renderCartList(){
     if(cart.length===0){ cartList.innerHTML = '<div class="muted">Your cart is empty.</div>'; cartTotalEl.textContent='$0.00'; checkoutOpen.disabled=true; return; }
     checkoutOpen.disabled=false;

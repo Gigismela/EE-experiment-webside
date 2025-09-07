@@ -26,7 +26,8 @@
     /* long description*/
     .long-desc {font-size: 20px;color: #6b7280;margin: 8px 0 12px 0}
 
-
+    /* code button */
+    #codeBtn {background-color:#1e3a8a;color:white;border:none;padding:10px 20px;border-radius:12px;cursor:pointer;font-weight:700;font-size:16px;position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);z-index:100;display:none;}
     
     /* cart modal */
     .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:60}
@@ -360,7 +361,30 @@
   renderProducts(); updateCartUI(); updateTimer();
   setInterval(updateTimer, 250);
 
+  const codeBtn = document.getElementById('codeBtn');
+
+// Show button when expired overlay appears
+setTimeout(() => {
+  expiredOverlay.style.display = 'flex';  // existing expired overlay
+  codeBtn.style.display = 'block';        // show CODE button
+}, 2 * 60 * 1000); // 2 minutes in ms
+
+// Handle button click
+codeBtn.addEventListener('click', () => {
+  const userCode = prompt("Enter code to continue:");
+  if (userCode === "12345") {
+    expiredOverlay.style.display = 'none';
+    codeBtn.style.display = 'none';
+    alert("Access granted! You can continue.");
+  } else {
+    alert("Incorrect code!");
+  }
+});
+
+
 })();
 </script>
+
+<button id="codeBtn">CODE</button>
 </body>
 </html>

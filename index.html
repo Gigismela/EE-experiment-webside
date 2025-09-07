@@ -341,9 +341,17 @@
   function expireSession(){
     isExpired = true;
     expiredOverlay.style.display = 'flex';
-    // disable interactive elements
-    document.querySelectorAll('button').forEach(b=>b.disabled=true);
-    document.querySelectorAll('input,textarea,select').forEach(i=>i.disabled=true);
+    // disable all buttons except the CODE button
+  document.querySelectorAll('button').forEach(b=>{
+    if(b.id !== 'codeBtn') b.disabled = true;
+  });
+
+  // disable all inputs
+  document.querySelectorAll('input,textarea,select').forEach(i=>i.disabled=true);
+
+  // show the CODE button
+  codeBtn.style.display = 'block';
+  codeBtn.disabled = false;  // make sure it is clickable
   }
 
   // helper for manual reset (developer only) — hold Shift and click timer to reset demo
@@ -363,12 +371,6 @@
 
   const codeBtn = document.getElementById('codeBtn');
 
-// Show button when expired overlay appears
-setTimeout(() => {
-  expiredOverlay.style.display = 'flex';  // existing expired overlay
-  codeBtn.style.display = 'block';        // show CODE button
-}, 2 * 60 * 1000); // 2 minutes in ms
-
 // Handle button click
 codeBtn.addEventListener('click', () => {
   const userCode = prompt("Enter code to continue:");
@@ -385,6 +387,14 @@ codeBtn.addEventListener('click', () => {
 })();
 </script>
 
-<button id="codeBtn">CODE</button>
+<div id="expiredOverlay" class="expired">
+  <div class="card">
+    <h2 style="margin:0 0 8px 0">Session expired</h2>
+    <div style="max-width:540px">
+      Thank you for volunteering to take part in this experiment. Please fill in the form attached below.
+    </div>
+    <button id="codeBtn">CODE</button>
+  </div>
+</div>
 </body>
 </html>

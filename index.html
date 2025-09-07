@@ -383,12 +383,15 @@ codeBtn.addEventListener('click', () => {
     expiredOverlay.style.display = 'none';
     codeBtn.style.display = 'none';
 
-    // Re-enable all buttons, inputs, textareas, and selects on the whole page
+     // Re-enable all buttons, inputs, textareas, and selects
     document.querySelectorAll('button, input, textarea, select').forEach(el => {
       el.disabled = false;
     });
 
-    // Optionally, update cart UI in case it was frozen
+    // Reset the session expired flag
+    isExpired = false;
+
+    // Update cart UI in case it was frozen
     updateCartUI();
 
     alert("Access granted! You can continue.");

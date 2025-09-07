@@ -191,12 +191,12 @@
 
   // ====== PRODUCTS ======
   const PRODUCTS = [
-    { id:'p1', title:'Black Hoodie 1', price:49.99, desc:'BESTSELLER', longDesc:'This Product is a unisex hoddie with an original design made out of 100% organic material' },
-    { id:'p2', title:'Black Hoodie 2', price:49.99, longDesc:'This Product is a unisex hoddie with an original design made out of 100% organic material' },
-    { id:'p3', title:'Black Hoodie 3', price:49.99, desc:'avaiable now', longDesc:'This Product is a unisex hoddie with an original design made out of 100% organic material' },
-    { id:'p4', title:'Black Hoodie 4', price:49.99, desc:'in stock', longDesc:'This Product is a unisex hoddie with an original design made out of 100% organic material' },
-    { id:'p5', title:'Black Hoodie 5', price:49.99, longDesc:'This Product is a unisex hoddie with an original design made out of 100% organic material' },
-    { id:'p6', title:'Black Hoodie 6', price:49.99, desc:'LAST 2 LEFT', longDesc:'This Product is a unisex hoddie with an original design made out of 100% organic material' }
+    { id:'p1', title:'Black Hoodie 1', price:49.99, desc:'BESTSELLER', longDesc:'This Product is a unisex hoddie with an original design made out of 100% organic material', images: ['images/hoodie1-front.jpg', 'images/hoodie1-back.jpg'] },
+    { id:'p2', title:'Black Hoodie 2', price:49.99, longDesc:'This Product is a unisex hoddie with an original design made out of 100% organic material',images: ['images/hoodie1-front.jpg', 'images/hoodie1-back.jpg'] },
+    { id:'p3', title:'Black Hoodie 3', price:49.99, desc:'avaiable now', longDesc:'This Product is a unisex hoddie with an original design made out of 100% organic material',images: ['images/hoodie1-front.jpg', 'images/hoodie1-back.jpg'] },
+    { id:'p4', title:'Black Hoodie 4', price:49.99, desc:'in stock', longDesc:'This Product is a unisex hoddie with an original design made out of 100% organic material',images: ['images/hoodie1-front.jpg', 'images/hoodie1-back.jpg'] },
+    { id:'p5', title:'Black Hoodie 5', price:49.99, longDesc:'This Product is a unisex hoddie with an original design made out of 100% organic material',images: ['images/hoodie1-front.jpg', 'images/hoodie1-back.jpg'] },
+    { id:'p6', title:'Black Hoodie 6', price:49.99, desc:'LAST 2 LEFT', longDesc:'This Product is a unisex hoddie with an original design made out of 100% organic material',images: ['images/hoodie1-front.jpg', 'images/hoodie1-back.jpg'] }
   ];
 
   // ====== HELPERS ======
@@ -212,7 +212,16 @@
   function renderProducts(){
     productsEl.innerHTML = PRODUCTS.map(p => `
       <div class="product" data-id="${p.id}">
-        <div class="img">${p.title.split(' ')[0]}</div>
+        <div style="display:flex;gap:10px;flex-direction:column">
+    <div style="text-align:center">
+    <img src="${p.images[0]}" alt="${escapeHtml(p.title)} Front" style="width:150px;height:150px;object-fit:cover;border-radius:8px"/>
+    <div style="font-size:12px;color:var(--muted)">Front</div>
+    </div>
+    <div style="text-align:center">
+    <img src="${p.images[1]}" alt="${escapeHtml(p.title)} Back" style="width:150px;height:150px;object-fit:cover;border-radius:8px"/>
+    <div style="font-size:12px;color:var(--muted)">Back</div>
+      </div>
+      </div>
         <div style="flex:1">
           <div style="font-weight:800">${escapeHtml(p.title)}</div>
           <div class="muted" style="font-size:13px">${escapeHtml(p.desc)}</div>

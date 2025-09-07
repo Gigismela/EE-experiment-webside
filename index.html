@@ -162,17 +162,7 @@
 (function(){
   // ====== CONFIG ======
   const SESSION_MS = 2 * 60 * 1000; // 2 minutes
-  const START_KEY = 'demoStart_EE---experiment-webside'; // unique key for this demo
-
-  // ====== PRODUCTS ======
-  const PRODUCTS = [
-    { id:'p1', title:'Black Hoodie 1', price:49.99, desc:'BESTSELLER', longDesc: 'DESCRIPTION' },
-    { id:'p2', title:'Black Hoodie 2', price:49.99, longDesc: 'DESCRIPTION' },
-    { id:'p3', title:'Black Hoodie 3', price:49.99, desc:'avaiable now', longDesc: 'DESCRIPTION' },
-    { id:'p4', title:'Black Hoodie 4', price:49.99, desc:'in stock', longDesc: 'DESCRIPTION' },
-    { id:'p5', title:'Black Hoodie 5', price:49.99, longDesc: 'DESCRIPTION' },
-    { id:'p6', title:'Black Hoodie 6', price:44.99, desc:'LAST 2 LEFT', longDesc: 'DESCRIPTION' }
-  ];
+  const START_KEY = 'demoStart_EE---experiment-webside';
 
   // ====== ELEMENTS ======
   const productsEl = document.getElementById('products');
@@ -182,15 +172,13 @@
   const cartList = document.getElementById('cartList');
   const cartTotalEl = document.getElementById('cartTotal');
   const checkoutOpen = document.getElementById('checkoutOpen');
-
   const checkoutOverlay = document.getElementById('checkoutOverlay');
   const closeCheckout = document.getElementById('closeCheckout');
   const checkoutForm = document.getElementById('checkoutForm');
   const checkoutTotal = document.getElementById('checkoutTotal');
-
   const timerEl = document.getElementById('timer');
   const expiredOverlay = document.getElementById('expiredOverlay');
-
+  const codeBtn = document.getElementById('codeBtn');
   const confirmationOverlay = document.getElementById('confirmationOverlay');
   const orderSummary = document.getElementById('orderSummary');
   const closeConfirmation = document.getElementById('closeConfirmation');
@@ -198,6 +186,25 @@
   // ====== STATE ======
   let cart = JSON.parse(localStorage.getItem('demoCart') || '[]');
   let isExpired = false;
+
+  // ====== PRODUCTS ======
+  const PRODUCTS = [
+    { id:'p1', title:'Black Hoodie 1', price:49.99, desc:'BESTSELLER', longDesc:'DESCRIPTION' },
+    { id:'p2', title:'Black Hoodie 2', price:49.99, longDesc:'DESCRIPTION' },
+    { id:'p3', title:'Black Hoodie 3', price:49.99, desc:'avaiable now', longDesc:'DESCRIPTION' },
+    { id:'p4', title:'Black Hoodie 4', price:49.99, desc:'in stock', longDesc:'DESCRIPTION' },
+    { id:'p5', title:'Black Hoodie 5', price:49.99, longDesc:'DESCRIPTION' },
+    { id:'p6', title:'Black Hoodie 6', price:44.99, desc:'LAST 2 LEFT', longDesc:'DESCRIPTION' }
+  ];
+
+  // ====== HELPERS ======
+  function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function saveCart(){ localStorage.setItem('demoCart', JSON.stringify(cart)); }
+  function ensureStart(){
+    let start = localStorage.getItem(START_KEY);
+    if(!start){ start = Date.now(); localStorage.setItem(START_KEY, String(start)); }
+    return Number(start);
+  }
 
   // ====== RENDER PRODUCTS ======
   function renderProducts(){
@@ -211,41 +218,26 @@
         </div>
         <div class="row">
           <div style="font-weight:700">$${p.price.toFixed(2)}</div>
-          <div>
-            <button class="btn addBtn" data-id="${p.id}">Add</button>
-          </div>
+          <div><button class="btn addBtn" data-id="${p.id}">Add</button></div>
         </div>
       </div>
     `).join('');
-    
-    // attach handlers
+
     document.querySelectorAll('.addBtn').forEach(btn => {
       btn.addEventListener('click', ()=>{
+        if(isExpired) return alert('Session expired');
         const id = btn.dataset.id;
-        addToCart(id);
+        const p = PRODUCTS.find(x=>x.id===id);
+        if(!p) return;
+        const existing = cart.find(i=>i.id===id);
+        if(existing) existing.qty += 1; else cart.push({id:p.id,title:p.title,price:p.price,qty:1});
+        saveCart(); updateCartUI();
       });
     });
   }
 
-  function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-
-  // ====== CART LOGIC ======
-  function addToCart(id){ if(isExpired) return alert('Session expired');
-    const p = PRODUCTS.find(x=>x.id===id); if(!p) return;
-    const existing = cart.find(i=>i.id===id);
-    if(existing) existing.qty += 1; else cart.push({id:p.id,title:p.title,price:p.price,qty:1});
-    saveCart(); updateCartUI();
-  }
-
-  function saveCart(){ localStorage.setItem('demoCart', JSON.stringify(cart)); }
-
-  function updateCartUI(){
-    cartBtn.textContent = `Cart (${cart.reduce((s,i)=>s+i.qty,0)})`;
-  }
-
-  function openCart(){ renderCartList(); cartOverlay.style.display='flex'; }
-  function closeCartFn(){ cartOverlay.style.display='none'; }
-
+  // ====== CART ======
+  function updateCartUI(){ cartBtn.textContent = `Cart (${cart.reduce((s,i)=>s+i.qty,0)})`; }
   function renderCartList(){
     if(cart.length===0){ cartList.innerHTML = '<div class="muted">Your cart is empty.</div>'; cartTotalEl.textContent='$0.00'; checkoutOpen.disabled=true; return; }
     checkoutOpen.disabled=false;
@@ -265,7 +257,6 @@
         </div>
       </div>
     `).join('');
-
     cartList.querySelectorAll('button').forEach(b=>{
       b.addEventListener('click', ()=>{
         const id = b.dataset.id; const act = b.dataset.act;
@@ -277,28 +268,29 @@
         saveCart(); renderCartList(); updateCartUI();
       });
     });
-
-    const total = cart.reduce((s,i)=>s + i.price*i.qty,0);
+    const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
     cartTotalEl.textContent = '$' + total.toFixed(2);
   }
+  function openCart(){ renderCartList(); cartOverlay.style.display='flex'; }
+  function closeCartFn(){ cartOverlay.style.display='none'; }
 
   // ====== CHECKOUT ======
-  function openCheckout(){ if(isExpired) return alert('Session expired');
+  function openCheckout(){ 
+    if(isExpired) return alert('Session expired');
     if(cart.length===0) return alert('Cart is empty');
     checkoutOverlay.style.display='flex';
     checkoutTotal.textContent = '$' + cart.reduce((s,i)=>s+i.price*i.qty,0).toFixed(2);
   }
   function closeCheckoutFn(){ checkoutOverlay.style.display='none'; }
 
-  checkoutForm.addEventListener('submit', function(e){ e.preventDefault();
+  checkoutForm.addEventListener('submit', e=>{
+    e.preventDefault();
     if(isExpired) return alert('Session expired');
-    // simple validation
     const name = document.getElementById('c_name').value.trim();
     const email = document.getElementById('c_email').value.trim();
     const address = document.getElementById('c_address').value.trim();
     if(!name||!email||!address) return alert('Please fill name, email and address (demo).');
 
-    // simulate processing
     const order = {
       id: 'DEMO-' + Math.random().toString(36).slice(2,10).toUpperCase(),
       name, email, address,
@@ -307,101 +299,75 @@
       time: new Date().toISOString()
     };
 
-    // show confirmation
     orderSummary.innerHTML = `<div><strong>Order ID:</strong> ${order.id}</div>
-      <div style="margin-top:8px"><strong>Items:</strong><ul>` + order.items.map(it=>`<li>${escapeHtml(it.title)} × ${it.qty} — $${(it.price*it.qty).toFixed(2)}</li>`).join('') + `</ul></div>
+      <div style="margin-top:8px"><strong>Items:</strong><ul>` +
+      order.items.map(it=>`<li>${escapeHtml(it.title)} × ${it.qty} — $${(it.price*it.qty).toFixed(2)}</li>`).join('') + `</ul></div>
       <div style="margin-top:8px"><strong>Total (demo):</strong> $${order.total}</div>
     `;
-
-    // clear cart but keep session
     cart = []; saveCart(); updateCartUI();
     checkoutOverlay.style.display='none';
     confirmationOverlay.style.display='flex';
   });
-
   closeConfirmation.addEventListener('click', ()=>{ confirmationOverlay.style.display='none'; });
 
   // ====== TIMER & SESSION ======
-  function ensureStart(){
-    let start = localStorage.getItem(START_KEY);
-    if(!start){ start = Date.now(); localStorage.setItem(START_KEY, String(start)); }
-    return Number(start);
-  }
-
   let startTs = ensureStart();
-
   function updateTimer(){
     const elapsed = Date.now() - startTs;
-  const remaining = Math.max(0, SESSION_MS - elapsed);
-  const mm = String(Math.floor(remaining/60000)).padStart(2,'0');
-  const ss = String(Math.floor((remaining%60000)/1000)).padStart(2,'0');
-  timerEl.textContent = `${mm}:${ss}`;
-  
-  // Only expire if isExpired is still true AND code hasn’t been entered
-  if(remaining <= 0 && isExpired) expireSession();
+    const remaining = Math.max(0, SESSION_MS - elapsed);
+    const mm = String(Math.floor(remaining/60000)).padStart(2,'0');
+    const ss = String(Math.floor((remaining%60000)/1000)).padStart(2,'0');
+    timerEl.textContent = `${mm}:${ss}`;
+    if(remaining <= 0 && !isExpired) expireSession();
   }
 
   function expireSession(){
-     isExpired = true;
-  expiredOverlay.style.display = 'flex';
-
-  // Disable all buttons except CODE
-  document.querySelectorAll('button').forEach(b => {
-    if (b.id !== 'codeBtn') b.disabled = true;
-  });
-
-  // Disable all inputs
-  document.querySelectorAll('input,textarea,select').forEach(i => i.disabled = true);
-
-  // SHOW CODE button
-  const codeBtn = document.getElementById('codeBtn');
-  codeBtn.style.display = 'inline-block';
-  codeBtn.disabled = false;
-
+    isExpired = true;
+    expiredOverlay.style.display = 'flex';
+    document.querySelectorAll('button').forEach(b=>{ if(b.id!=='codeBtn') b.disabled = true; });
+    document.querySelectorAll('input,textarea,select').forEach(i=>i.disabled = true);
+    codeBtn.style.display = 'inline-block';
+    codeBtn.disabled = false;
   }
 
-  // helper for manual reset (developer only) — hold Shift and click timer to reset demo
-  timerEl.addEventListener('click', (e)=>{
-    if(e.shiftKey){ localStorage.removeItem(START_KEY); startTs = ensureStart(); isExpired=false; document.querySelectorAll('button,input').forEach(el=>el.disabled=false); expiredOverlay.style.display='none'; updateTimer(); alert('Demo timer reset (developer).'); }
+  timerEl.addEventListener('click', e=>{
+    if(e.shiftKey){
+      localStorage.removeItem(START_KEY);
+      startTs = ensureStart();
+      isExpired=false;
+      document.querySelectorAll('button,input,textarea,select').forEach(el=>el.disabled=false);
+      expiredOverlay.style.display='none';
+      updateTimer();
+      alert('Demo timer reset (developer).');
+    }
   });
 
   // ====== UI EVENTS ======
   cartBtn.addEventListener('click', openCart);
   closeCart.addEventListener('click', closeCartFn);
-  checkoutOpen.addEventListener('click', ()=>{ openCheckout(); });
+  checkoutOpen.addEventListener('click', openCheckout);
   closeCheckout.addEventListener('click', closeCheckoutFn);
 
-  // init
-  renderProducts(); updateCartUI(); updateTimer();
+  // ====== CODE BUTTON ======
+  codeBtn.addEventListener('click', ()=>{
+    const userCode = prompt("Enter code to continue:");
+    if(userCode==="12345"){
+      expiredOverlay.style.display='none';
+      codeBtn.style.display='none';
+      document.querySelectorAll('button,input,textarea,select').forEach(el=>el.disabled=false);
+      isExpired = false;
+      updateCartUI();
+      alert("Access granted! You can continue.");
+    } else {
+      alert("Incorrect code!");
+    }
+  });
+
+  // ====== INIT ======
+  renderProducts();
+  updateCartUI();
+  updateTimer();
   setInterval(updateTimer, 250);
-
- 
-
-  // CODE button logic
- const codeBtn = document.getElementById('codeBtn');
-codeBtn.addEventListener('click', () => {
-  const userCode = prompt("Enter code to continue:");
-  if (userCode === "12345") {
-    expiredOverlay.style.display = 'none';
-    codeBtn.style.display = 'none';
-
-     // Re-enable all buttons, inputs, textareas, and selects
-    document.querySelectorAll('button, input, textarea, select').forEach(el => {
-      el.disabled = false;
-    });
-
-    // Reset the session expired flag
-    isExpired = false;
-
-    // Update cart UI in case it was frozen
-    updateCartUI();
-
-    alert("Access granted! You can continue.");
-  } else {
-    alert("Incorrect code!");
-  }
-});
-
 
 })();
 </script>

@@ -8,11 +8,6 @@
     :root{--accent:#2563eb;--muted:#6b7280;--bg:#f7f8fb}
     *{box-sizing:border-box}
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; margin:0;background:var(--bg);color:#111}
-    header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;background:white;box-shadow:0 1px 6px rgba(2,6,23,0.06)}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#eef2ff,#dbeafe);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)}
-    .demo-badge{background:#ffedd5;color:#9a3412;padding:6px 8px;border-radius:8px;font-weight:700;font-size:12px}
-    .top-right{display:flex;gap:12px;align-items:center}
     .timer{font-weight:700;color:#111}
     .btn{background:white;border:1px solid #e6e6e9;padding:8px 10px;border-radius:8px;cursor:pointer}
     .btn.primary{background:var(--accent);color:white;border:none}
@@ -48,67 +43,27 @@
 
     @media (max-width:520px){.modal{width:92vw}}
     
-    header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 22px;
-  background: white;
-  box-shadow: 0 2px 8px rgba(2,6,23,0.1);
-}
+    header {position: sticky;top: 0;z-index: 100;display: flex;align-items: center;justify-content: space-between;padding: 10px 22px;background: white;box-shadow: 0 2px 8px rgba(2,6,23,0.1)}
 
-.header-left {
-  display: flex;
-  align-items: center;
-}
+.header-left {display: flex;align-items: center;}
 
-.banner-img {
-  width: 1200px;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 8px;
-}
+.banner-img {width: 100%;max-width: 1200px;height: 200px;object-fit: cover;border-radius: 8px;}
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
+.header-right {display: flex;align-items: center;gap: 20px;}
 
-.timer {
-  font-weight: 800;
-  font-size: 22px; /* larger timer */
-}
+.timer {font-weight: 800;font-size: 22px;}
 
-.cart-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
+.cart-btn {display: flex;align-items: center;gap: 6px;background: none;border: none;cursor: pointer;}
 
-.cart-icon {
-  width: 42px;
-  height: 42px;
-}
-
-#cartCount {
-  font-size: 18px;
-  font-weight: 700;
-  color: #111;
-}
+.cart-icon {width: 42px;height: 42px;}
+  #cartCount {font-size: 18px;font-weight: 700;color: #111;margin-left: 4px;}
 
   </style>
 </head>
 <body>
  <header>
   <div class="header-left">
-    <img src="Eternal.jpg" alt="Banner" class="eternal-img">
+    <img src="Eternal.jpg" alt="Banner" class="banner-img">
   </div>
   <div class="header-right">
     <div class="timer" id="timer">02:00</div>

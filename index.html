@@ -340,7 +340,7 @@
   }
 
   function expireSession(){
-    isExpired = true;
+     isExpired = true;
   expiredOverlay.style.display = 'flex';
 
   // Disable all buttons except CODE
@@ -350,6 +350,11 @@
 
   // Disable all inputs
   document.querySelectorAll('input,textarea,select').forEach(i => i.disabled = true);
+
+  // SHOW CODE button
+  const codeBtn = document.getElementById('codeBtn');
+  codeBtn.style.display = 'inline-block';
+  codeBtn.disabled = false;
 
   }
 

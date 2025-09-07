@@ -17,14 +17,8 @@
     .img{width:200px;height:200px;border-radius:8px;background:linear-gradient(135deg,#f3f4f6,#e6eefc);display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:700}
     .row{display:flex;justify-content:space-between;align-items:center}
     .muted{color:var(--muted);font-size:13px}
-
-    /* long description*/
     .long-desc {font-size: 14px;color: #6b7280;margin: 8px 0 12px 0;width:100%}
-
-    /* code button */
     #codeBtn {background-color:#1e3a8a;color:white;border:none;padding:10px 20px;border-radius:12px;cursor:pointer;font-weight:700;font-size:16px;display:none;margin-top:20px}
-    
-    /* cart modal */
     .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:60}
     .modal{width:420px;background:white;border-radius:12px;padding:16px;box-shadow:0 10px 30px rgba(2,6,23,0.2)}
     .cart-list{max-height:260px;overflow:auto;margin-top:8px}
@@ -34,11 +28,8 @@
     .form-row{display:flex;gap:8px}
     .field{flex:1;display:flex;flex-direction:column;gap:6px}
     input,select,textarea{padding:8px;border-radius:8px;border:1px solid #e6e6e9}
-
-    /* expired overlay */
     .expired{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:80;color:white}
     .expired .card{background:transparent;color:white;text-align:center}
-
     footer{padding:18px 22px;text-align:center;color:var(--muted);font-size:13px}
     @media (max-width:520px){.modal{width:92vw}}
     header {position: sticky;top: 0;z-index: 100;display: flex;align-items: center;justify-content: space-between;padding: 10px 22px;background: white;box-shadow: 0 2px 8px rgba(2,6,23,0.1)}
@@ -47,13 +38,14 @@
     .timer {font-weight: 800;font-size: 22px;}
     .cart-btn {display: flex;align-items: center;gap: 6px;background: none;border: none;cursor: pointer;}
     .cart-icon {width: 42px;height: 42px;}
+    .cart-icon.disabled {filter: grayscale(100%) brightness(60%);opacity: 0.5;}
     #cartCount {font-size: 18px;font-weight: 700;color: #111;margin-left: 4px;}
     .header-shaded {background: rgba(0, 0, 0, 0.6);pointer-events: none;}
     .banner-wrapper {position: relative;width: 100%;max-width: 1200px;height: 200px;}
     .banner-img {width: 100%;height: 100%;object-fit: cover;border-radius: 8px;display: block}
     .banner-overlay {position: absolute; inset: 0;background: rgba(0, 0, 0, 0.6);border-radius: 8px;display: none;z-index: 1;opacity: 0;transition: opacity 0.5s ease;}
     .banner-overlay.show {opacity: 1;}
-    #notification {position: fixed;top: 20px;left: 50%;transform: translateX(-50%);background: #111;color: #fff;padding: 14px 20px;border-radius: 10px;font-weight: 600;font-size: 15px;z-index: 1000;opacity: 0;transition: opacity 0.6s ease-in-out;pointer-events: none;max-width: 90%;width: max-content;box-shadow: 0 6px 12px rgba(0,0,0,0.2);}
+   #notification {position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);background: #111;color: #fff;padding: 14px 20px;border-radius: 10px;font-weight: 600;font-size: 15px;z-index: 1000;opacity: 0;transition: opacity 0.6s ease-in-out;pointer-events: none;max-width: 90%;width: max-content;box-shadow: 0 6px 12px rgba(0,0,0,0.2);}
     
   </style>
 </head>
@@ -388,6 +380,7 @@
     overlay.style.display = 'block';
     requestAnimationFrame(() => overlay.classList.add('show'));
     document.querySelectorAll('button').forEach(b=>{ if(b.id!=='codeBtn') b.disabled = true; });
+    document.querySelector('.cart-icon').classList.add('disabled');
     document.querySelectorAll('input,textarea,select').forEach(i=>i.disabled = true);
     codeBtn.style.display = 'inline-block';
     codeBtn.disabled = false;
@@ -423,6 +416,7 @@
 
     // Re-enable all buttons, inputs, textareas, selects
     document.querySelectorAll('button,input,textarea,select').forEach(el=>el.disabled=false);
+    document.querySelector('.cart-icon').classList.remove('disabled');
 
     // Mark session as unlocked
     isExpired = false;

@@ -212,16 +212,17 @@
   function renderProducts(){
     productsEl.innerHTML = PRODUCTS.map(p => `
       <div class="product" data-id="${p.id}">
-        <div style="display:flex;gap:10px;flex-direction:column">
-    <div style="text-align:center">
-    <img src="${p.images[0]}" alt="${escapeHtml(p.title)} Front" style="width:150px;height:150px;object-fit:cover;border-radius:8px"/>
+       <div style="display:flex;gap:20px;flex-direction:row;justify-content:center">
+  <div style="text-align:center">
+    <img src="${p.images[0]}" alt="${escapeHtml(p.title)} Front" style="width:200px;height:200px;object-fit:cover;border-radius:8px"/>
     <div style="font-size:12px;color:var(--muted)">Front</div>
-    </div>
-    <div style="text-align:center">
-    <img src="${p.images[1]}" alt="${escapeHtml(p.title)} Back" style="width:150px;height:150px;object-fit:cover;border-radius:8px"/>
+  </div>
+  <div style="text-align:center">
+    <img src="${p.images[1]}" alt="${escapeHtml(p.title)} Back" style="width:200px;height:200px;object-fit:cover;border-radius:8px"/>
     <div style="font-size:12px;color:var(--muted)">Back</div>
-      </div>
-      </div>
+  </div>
+</div>
+
         <div style="flex:1">
           <div style="font-weight:800">${escapeHtml(p.title)}</div>
           <div class="muted" style="font-size:13px">${escapeHtml(p.desc)}</div>

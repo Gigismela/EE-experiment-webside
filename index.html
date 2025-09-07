@@ -145,7 +145,7 @@
 
   <div id="confirmationOverlay" class="overlay" style="display:none">
     <div class="modal">
-      <h3>Order confirmed (Demo)</h3>
+      <h3>Order confirmed</h3>
       <div id="orderSummary"></div>
       <div style="margin-top:12px;display:flex;justify-content:flex-end">
         <button id="closeConfirmation" class="btn primary">Done</button>
@@ -341,7 +341,7 @@
     if(!name||!email||!address) return alert('Please fill name, email and address (demo).');
 
     const order = {
-      id: 'DEMO-' + Math.random().toString(36).slice(2,10).toUpperCase(),
+      id: 'EE-' + Math.random().toString(36).slice(2,10).toUpperCase(),
       name, email, address,
       items: cart.slice(),
       total: cart.reduce((s,i)=>s+i.price*i.qty,0).toFixed(2),
@@ -351,7 +351,7 @@
     orderSummary.innerHTML = `<div><strong>Order ID:</strong> ${order.id}</div>
       <div style="margin-top:8px"><strong>Items:</strong><ul>` +
       order.items.map(it=>`<li>${escapeHtml(it.title)} × ${it.qty} — $${(it.price*it.qty).toFixed(2)}</li>`).join('') + `</ul></div>
-      <div style="margin-top:8px"><strong>Total (demo):</strong> $${order.total}</div>
+      <div style="margin-top:8px"><strong>Total:</strong> $${order.total}</div>
     `;
     cart = []; saveCart(); updateCartUI();
     checkoutOverlay.style.display='none';

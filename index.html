@@ -361,7 +361,7 @@
     checkoutOverlay.style.display='none';
     confirmationOverlay.style.display='flex';
   });
-  closeConfirmation.addEventListener('click', ()=>{ confirmationOverlay.style.display='none'; });
+  closeConfirmation.addEventListener('click', ()=>{ confirmationOverlay.style.display='none'; cartOverlay.style.display = 'none';});
 
   // ====== TIMER & SESSION ======
   let startTs = ensureStart();

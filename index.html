@@ -27,7 +27,7 @@
     .long-desc {font-size: 20px;color: #6b7280;margin: 8px 0 12px 0}
 
     /* code button */
-    #codeBtn {background-color:#1e3a8a;color:white;border:none;padding:10px 20px;border-radius:12px;cursor:pointer;font-weight:700;font-size:16px;position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);z-index:100;display:none;}
+    #codeBtn {background-color:#1e3a8a;color:white;border:none;padding:10px 20px;border-radius:12px;cursor:pointer;font-weight:700;font-size:16px;display:none;margin-top:20px}
     
     /* cart modal */
     .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:60}
@@ -150,6 +150,7 @@
       <div style="margin-top:12px;display:flex;justify-content:flex-end">
         <button id="closeConfirmation" class="btn primary">Done</button>
       </div>
+      <button id="codeBtn">CODE</button>
     </div>
   </div>
 
@@ -340,18 +341,20 @@
 
   function expireSession(){
     isExpired = true;
-    expiredOverlay.style.display = 'flex';
-    // disable all buttons except the CODE button
-  document.querySelectorAll('button').forEach(b=>{
-    if(b.id !== 'codeBtn') b.disabled = true;
+  expiredOverlay.style.display = 'flex';
+
+  // Disable all buttons except CODE
+  document.querySelectorAll('button').forEach(b => {
+    if (b.id !== 'codeBtn') b.disabled = true;
   });
 
-  // disable all inputs
-  document.querySelectorAll('input,textarea,select').forEach(i=>i.disabled=true);
+  // Disable all inputs
+  document.querySelectorAll('input,textarea,select').forEach(i => i.disabled = true);
 
-  // show the CODE button
-  codeBtn.style.display = 'block';
-  codeBtn.disabled = false;  // make sure it is clickable
+  // Show and enable CODE button
+  const codeBtn = document.getElementById('codeBtn');
+  codeBtn.style.display = 'inline-block';
+  codeBtn.disabled = false;
   }
 
   // helper for manual reset (developer only) — hold Shift and click timer to reset demo
@@ -383,6 +386,19 @@ codeBtn.addEventListener('click', () => {
   }
 });
 
+  // Step 4: CODE button logic
+  const codeBtn = document.getElementById('codeBtn');
+  codeBtn.addEventListener('click', () => {
+    const userCode = prompt("Enter code to continue:");
+    if (userCode === "12345") {
+      expiredOverlay.style.display = 'none';
+      codeBtn.style.display = 'none';
+      alert("Access granted! You can continue.");
+      document.querySelectorAll('button,input,textarea,select').forEach(el => el.disabled = false);
+    } else {
+      alert("Incorrect code!");
+    }
+  });
 
 })();
 </script>

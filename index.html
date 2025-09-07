@@ -382,7 +382,15 @@ codeBtn.addEventListener('click', () => {
   if (userCode === "12345") {
     expiredOverlay.style.display = 'none';
     codeBtn.style.display = 'none';
-    document.querySelectorAll('button,input,textarea,select').forEach(el => el.disabled = false);
+
+    // Re-enable all buttons, inputs, textareas, and selects on the whole page
+    document.querySelectorAll('button, input, textarea, select').forEach(el => {
+      el.disabled = false;
+    });
+
+    // Optionally, update cart UI in case it was frozen
+    updateCartUI();
+
     alert("Access granted! You can continue.");
   } else {
     alert("Incorrect code!");

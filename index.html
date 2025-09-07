@@ -361,7 +361,7 @@
     checkoutOverlay.style.display='none';
     confirmationOverlay.style.display='flex';
   });
-  closeConfirmation.addEventListener('click', ()=>{ confirmationOverlay.style.display='none'; cartOverlay.style.display = 'none';});
+  closeConfirmation.addEventListener('click', ()=>{ confirmationOverlay.style.display='none'; cartOverlay.style.display = 'none';showFinalThankYouScreen();});
 
   // ====== TIMER & SESSION ======
   let startTs = ensureStart();
@@ -401,6 +401,57 @@
       alert('Demo timer reset (developer).');
     }
   });
+
+  function showFinalThankYouScreen() {
+  isExpired = true;
+  codeBtn.style.display = 'inline-block';
+  codeBtn.disabled = false;
+  expiredOverlay.style.display = 'flex';
+  document.querySelector('header').classList.add('header-shaded');
+
+  const overlay = document.querySelector('.banner-overlay');
+  overlay.style.display = 'block';
+  requestAnimationFrame(() => overlay.classList.add('show'));
+
+  // Disable everything except CODE button
+  document.querySelectorAll('button').forEach(b => {
+    if (b.id !== 'codeBtn') b.disabled = true;
+  });
+  document.querySelectorAll('input, textarea, select').forEach(i => i.disabled = true);
+  document.querySelector('.cart-icon').classList.add('disabled');
+
+  // ✅ Change the message
+  const expiredCard = document.querySelector('#expiredOverlay .card');
+  expiredCard.innerHTML = `
+    <h2 style="margin:0 0 8px 0">Thank you for taking part in this experiment</h2>
+    <div style="max-width:540px">Please fill in the form attached below.</div>
+    <div style="margin-top:12px; display: flex; gap: 12px; justify-content: center;">
+      <button id="codeBtn" style="display:inline-block">CODE</button>
+      <a id="formBtn" class="btn gray" href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=hwG7uirk5U6FtsrhKvQi5NFIX1m4SaBOsbVA-bkf2mtUMEpORzg1TkVJUDI1R1AyU1VRN1RDNEU0VS4u" target="_blank">FORM</a>
+    </div>
+  `;
+
+  // Re-bind the CODE button
+  document.getElementById('codeBtn').addEventListener('click', () => {
+    const userCode = prompt("Enter code to continue:");
+    if (userCode === "12345") {
+      expiredOverlay.style.display = 'none';
+      const overlay = document.querySelector('.banner-overlay');
+      overlay.classList.remove('show');
+      setTimeout(() => overlay.style.display = 'none', 500);
+      codeBtn.style.display = 'none';
+      document.querySelectorAll('button,input,textarea,select').forEach(el => el.disabled = false);
+      document.querySelector('.cart-icon').classList.remove('disabled');
+      isExpired = false;
+      codeEntered = true;
+      updateCartUI();
+      alert("Access granted! You can continue.");
+    } else {
+      alert("Incorrect code!");
+    }
+    document.querySelector('header').classList.remove('header-shaded');
+  });
+}
 
   // ====== UI EVENTS ======
   cartBtn.addEventListener('click', openCart);

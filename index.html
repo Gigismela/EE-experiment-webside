@@ -269,20 +269,35 @@
     `).join('');
 
     document.querySelectorAll('.addBtn').forEach(btn => {
-  btn.addEventListener('click', ()=>{
-    if(isExpired) return alert('Session expired');
-    const id = btn.dataset.id;
-    const p = PRODUCTS.find(x=>x.id===id);
-    if(!p) return;
-    const existing = cart.find(i=>i.id===id);
-    if(existing) {
-      existing.qty += 1;
-    } else {
-      cart.push({id:p.id,title:p.title,price:p.price,qty:1});
+ btn.addEventListener('click', () => {
+  if (isExpired) return alert('Session expired');
+
+  // Count total items in cart
+  const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+  if (totalQty >= 2) {
+    alert("You can only add up to 2 products in total.");
+    return;
+  }
+
+  const id = btn.dataset.id;
+  const p = PRODUCTS.find(x => x.id === id);
+  if (!p) return;
+
+  const existing = cart.find(i => i.id === id);
+  if (existing) {
+    if (totalQty + 1 > 2) {
+      alert("You can only add up to 2 products in total.");
+      return;
     }
-    saveCart(); updateCartUI();
-    showNotification(`Product ${p.title} added to the cart`);
-  });
+    existing.qty += 1;
+  } else {
+    cart.push({ id: p.id, title: p.title, price: p.price, qty: 1 });
+  }
+
+  saveCart();
+  updateCartUI();
+  showNotification(`Product ${p.title} added to the cart`);
+});
 });
 
   }
@@ -317,7 +332,14 @@
         const idx = cart.findIndex(x=>x.id===id);
         if(idx===-1) return;
         if(act==='dec'){ cart[idx].qty = Math.max(1, cart[idx].qty-1); }
-        if(act==='inc'){ cart[idx].qty += 1; }
+        if (act === 'inc') {
+  const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+  if (totalQty >= 2) {
+    alert("You can only have 2 items in total.");
+    return;
+  }
+  cart[idx].qty += 1;
+}
         if(act==='rem'){ cart.splice(idx,1); }
         saveCart(); renderCartList(); updateCartUI();
       });
@@ -338,6 +360,19 @@
   function closeCheckoutFn(){ checkoutOverlay.style.display='none'; }
 
   checkoutForm.addEventListener('submit', e=>{
+    e.preventDefault();
+  if (isExpired) return alert('Session expired');
+
+  const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+  if (totalQty > 2) {
+    alert("You can only purchase a maximum of 2 products.");
+    return;
+  }
+
+  const name = document.getElementById('c_name').value.trim();
+  const email = document.getElementById('c_email').value.trim();
+  const address = document.getElementById('c_address').value.trim();
+  if (!name || !email || !address) return alert('Please fill name, email and address (demo).');
     e.preventDefault();
     if(isExpired) return alert('Session expired');
     const name = document.getElementById('c_name').value.trim();

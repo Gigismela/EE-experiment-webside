@@ -310,46 +310,56 @@
   document.getElementById('cartCount').textContent = `(${cart.reduce((s,i)=>s+i.qty,0)})`;
 }
 
-  function renderCartList(){
-    if(cart.length===0){ cartList.innerHTML = '<div class="muted">Your cart is empty.</div>'; cartTotalEl.textContent='$0.00'; checkoutOpen.disabled=true; return; }
-    checkoutOpen.disabled=false;
-    cartList.innerHTML = cart.map(item => `
-      <div class="cart-item">
-        <div style="flex:1">
-          <div style="font-weight:700">${escapeHtml(item.title)}</div>
-          <div class="muted">Qty: <strong>${item.qty}</strong></div>
+ function renderCartList() {
+  cartList.innerHTML = '';
+  if (cart.length === 0) {
+    cartList.innerHTML = '<p>Your cart is empty.</p>';
+  } else {
+    cart.forEach((item, idx) => {
+      const div = document.createElement('div');
+      div.className = 'cart-item';
+      div.innerHTML = `
+        <span>${escapeHtml(item.title)} (x${item.qty}) - $${(item.price * item.qty).toFixed(2)}</span>
+        <div>
+          <button data-idx="${idx}" data-act="inc">+</button>
+          <button data-idx="${idx}" data-act="dec">-</button>
+          <button data-idx="${idx}" data-act="remove">Remove</button>
         </div>
-        <div style="text-align:right">
-          <div>$${(item.price*item.qty).toFixed(2)}</div>
-          <div style="margin-top:6px">
-            <button class="btn small" data-act="dec" data-id="${item.id}">-</button>
-            <button class="btn small" data-act="inc" data-id="${item.id}">+</button>
-            <button class="btn" data-act="rem" data-id="${item.id}">Remove</button>
-          </div>
-        </div>
-      </div>
-    `).join('');
-    cartList.querySelectorAll('button').forEach(b=>{
-      b.addEventListener('click', ()=>{
-        const id = b.dataset.id; const act = b.dataset.act;
-        const idx = cart.findIndex(x=>x.id===id);
-        if(idx===-1) return;
-        if(act==='dec'){ cart[idx].qty = Math.max(1, cart[idx].qty-1); }
-       if (act === 'inc') {
-  if (getTotalQty() >= 2) {
-    alert("You can only have 2 items in total.");
-    return;
+      `;
+      cartList.appendChild(div);
+    });
   }
-  cart[idx].qty += 1;
+  // Update total
+  cartTotal.textContent = cart.reduce((s, i) => s + i.price * i.qty, 0).toFixed(2);
+
+  // Enable checkout only if exactly 2 items are in the cart
+  checkoutOpen.disabled = (getTotalQty() !== 2);
+
+  // Event delegation for inc/dec/remove
+  cartList.querySelectorAll('button').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.dataset.idx);
+      const act = btn.dataset.act;
+      if (act === 'inc') {
+        if (getTotalQty() >= 2) {
+          alert("You can only have 2 items in total.");
+          return;
+        }
+        cart[idx].qty += 1;
+      } else if (act === 'dec') {
+        // Allow decrement, but keep at least 1 per item
+        cart[idx].qty = Math.max(1, cart[idx].qty - 1);
+      } else if (act === 'remove') {
+        cart.splice(idx, 1);
+      }
+      saveCart();
+      updateCartUI();
+    };
+  });
 }
 
-        if(act==='rem'){ cart.splice(idx,1); }
-        saveCart(); renderCartList(); updateCartUI();
-      });
-    });
-    const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
-    cartTotalEl.textContent = '$' + total.toFixed(2);
-  }
+
+  
   function openCart(){ renderCartList(); cartOverlay.style.display='flex'; }
   function closeCartFn(){ cartOverlay.style.display='none'; }
 

@@ -366,10 +366,10 @@
   e.preventDefault();
   if (isExpired) return alert('Session expired');
 
-  if (getTotalQty() > 2) {
-    alert("You can only purchase a maximum of 2 products.");
-    return;
-  }
+  if (getTotalQty() !== 2) {
+  alert("You must purchase exactly 2 products.");
+  return;
+}
 
   const name = document.getElementById('c_name').value.trim();
   const email = document.getElementById('c_email').value.trim();

@@ -330,7 +330,7 @@
     });
   }
   // Update total
-  cartTotal.textContent = cart.reduce((s, i) => s + i.price * i.qty, 0).toFixed(2);
+  cartTotalEl.textContent = "$" + cart.reduce((s, i) => s + i.price * i.qty, 0).toFixed(2);
 
   // Enable checkout only if exactly 2 items are in the cart
   checkoutOpen.disabled = (getTotalQty() !== 2);

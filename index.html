@@ -213,6 +213,9 @@
     if(!start){ start = Date.now(); localStorage.setItem(START_KEY, String(start)); }
     return Number(start);
   }
+  function getTotalQty() {
+  return cart.reduce((sum, item) => sum + item.qty, 0);
+}
 
  function showNotification(message) {
   const notif = document.getElementById('notification');
@@ -274,10 +277,10 @@
 
   // Count total items in cart
   const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-  if (totalQty >= 2) {
-    alert("You can only add up to 2 products in total.");
-    return;
-  }
+  if (getTotalQty() >= 2) {
+  alert("You can only add up to 2 products in total.");
+  return;
+}
 
   const id = btn.dataset.id;
   const p = PRODUCTS.find(x => x.id === id);
@@ -332,14 +335,14 @@
         const idx = cart.findIndex(x=>x.id===id);
         if(idx===-1) return;
         if(act==='dec'){ cart[idx].qty = Math.max(1, cart[idx].qty-1); }
-        if (act === 'inc') {
-  const totalQty = cart.reduce((s, i) => s + i.qty, 0);
-  if (totalQty >= 2) {
+       if (act === 'inc') {
+  if (getTotalQty() >= 2) {
     alert("You can only have 2 items in total.");
     return;
   }
   cart[idx].qty += 1;
 }
+
         if(act==='rem'){ cart.splice(idx,1); }
         saveCart(); renderCartList(); updateCartUI();
       });
@@ -360,11 +363,10 @@
   function closeCheckoutFn(){ checkoutOverlay.style.display='none'; }
 
   checkoutForm.addEventListener('submit', e=>{
-    e.preventDefault();
+  e.preventDefault();
   if (isExpired) return alert('Session expired');
 
-  const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-  if (totalQty > 2) {
+  if (getTotalQty() > 2) {
     alert("You can only purchase a maximum of 2 products.");
     return;
   }
@@ -373,30 +375,26 @@
   const email = document.getElementById('c_email').value.trim();
   const address = document.getElementById('c_address').value.trim();
   if (!name || !email || !address) return alert('Please fill name, email and address (demo).');
-    e.preventDefault();
-    if(isExpired) return alert('Session expired');
-    const name = document.getElementById('c_name').value.trim();
-    const email = document.getElementById('c_email').value.trim();
-    const address = document.getElementById('c_address').value.trim();
-    if(!name||!email||!address) return alert('Please fill name, email and address (demo).');
 
-    const order = {
-      id: 'EE-' + Math.random().toString(36).slice(2,10).toUpperCase(),
-      name, email, address,
-      items: cart.slice(),
-      total: cart.reduce((s,i)=>s+i.price*i.qty,0).toFixed(2),
-      time: new Date().toISOString()
-    };
+  const order = {
+    id: 'EE-' + Math.random().toString(36).slice(2,10).toUpperCase(),
+    name, email, address,
+    items: cart.slice(),
+    total: cart.reduce((s,i)=>s+i.price*i.qty,0).toFixed(2),
+    time: new Date().toISOString()
+  };
 
-    orderSummary.innerHTML = `<div><strong>Order ID:</strong> ${order.id}</div>
-      <div style="margin-top:8px"><strong>Items:</strong><ul>` +
-      order.items.map(it=>`<li>${escapeHtml(it.title)} × ${it.qty} — $${(it.price*it.qty).toFixed(2)}</li>`).join('') + `</ul></div>
-      <div style="margin-top:8px"><strong>Total:</strong> $${order.total}</div>
-    `;
-    cart = []; saveCart(); updateCartUI();
-    checkoutOverlay.style.display='none';
-    confirmationOverlay.style.display='flex';
-  });
+  orderSummary.innerHTML = `<div><strong>Order ID:</strong> ${order.id}</div>
+    <div style="margin-top:8px"><strong>Items:</strong><ul>` +
+    order.items.map(it=>`<li>${escapeHtml(it.title)} × ${it.qty} — $${(it.price*it.qty).toFixed(2)}</li>`).join('') + `</ul></div>
+    <div style="margin-top:8px"><strong>Total:</strong> $${order.total}</div>
+  `;
+  cart = []; saveCart(); updateCartUI();
+  checkoutOverlay.style.display='none';
+  confirmationOverlay.style.display='flex';
+});
+
+  
   closeConfirmation.addEventListener('click', ()=>{ confirmationOverlay.style.display='none'; cartOverlay.style.display = 'none';showFinalThankYouScreen();});
 
   // ====== TIMER & SESSION ======
